@@ -42,6 +42,10 @@ type Log struct {
 		StartInclusive time.Time `json:"start_inclusive"`
 		EndExclusive   time.Time `json:"end_exclusive"`
 	} `json:"temporal_interval,omitzero"`
+	LogSoftware *struct {
+		Name    string `json:"name"`
+		Version string `json:"version"`
+	} `json:"log_software,omitzero"`
 
 	// certspotter-specific extensions
 	CertspotterDownloadSize int     `json:"certspotter_download_size,omitzero"`
