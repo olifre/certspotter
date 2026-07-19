@@ -144,7 +144,7 @@ func readEmailFile(filename string) ([]string, error) {
 		}
 		emails = append(emails, line)
 	}
-	return emails, err
+	return emails, scanner.Err()
 }
 
 func appendFunc(slice *[]string) func(string) error {
