@@ -23,6 +23,14 @@ import (
 
 var UserAgent = ""
 
+// maxResponseBytes bounds the size of a log list we are willing to read into memory.
+const maxResponseBytes = 16 << 20 // 16 MiB
+
+// httpClient is used for fetching log lists.
+var httpClient = &http.Client{
+	Timeout: 60 * time.Second,
+}
+
 type ModificationToken struct {
 	etag     string
 	modified time.Time
@@ -76,14 +84,17 @@ func FetchIfModified(ctx context.Context, url string, token *ModificationToken) 
 	if token != nil {
 		token.setRequestHeaders(request)
 	}
-	response, err := http.DefaultClient.Do(request)
+	response, err := httpClient.Do(request)
 	if err != nil {
 		return nil, nil, err
 	}
-	content, err := io.ReadAll(response.Body)
+	content, err := io.ReadAll(io.LimitReader(response.Body, maxResponseBytes+1))
 	response.Body.Close()
 	if err != nil {
 		return nil, nil, err
+	}
+	if len(content) > maxResponseBytes {
+		return nil, nil, fmt.Errorf("%s: response body exceeds maximum allowed size of %d bytes", url, maxResponseBytes)
 	}
 	if token != nil && response.StatusCode == http.StatusNotModified {
 		return nil, nil, ErrNotModified
