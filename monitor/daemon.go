@@ -95,6 +95,7 @@ func (daemon *daemon) startTask(ctx context.Context, ctlog *loglist.Log) task {
 func (daemon *daemon) loadLogList(ctx context.Context) error {
 	newLogList, newToken, err := getLogList(ctx, daemon.config.LogListSource, daemon.logListToken)
 	if errors.Is(err, loglist.ErrNotModified) {
+		daemon.logsLoadedAt = time.Now() // so the log list is not reported as stale
 		return nil
 	} else if err != nil {
 		return err
