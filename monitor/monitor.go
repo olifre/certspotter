@@ -209,7 +209,7 @@ func newLogClient(config *Config, ctlog *loglist.Log) (ctclient.Log, ctclient.Is
 		}
 		var httpClient *http.Client
 		if strings.Contains(ctlog.URL, "digicert") {
-			httpClient := ctclient.NewHTTPClient(nil)
+			httpClient = ctclient.NewHTTPClient(nil)
 			httpClient.Transport.(*http.Transport).DisableKeepAlives = true
 		}
 		return &logClient{
