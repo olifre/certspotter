@@ -17,8 +17,10 @@ import (
 	"golang.org/x/time/rate"
 	"log"
 	mathrand "math/rand/v2"
+	"net/http"
 	"net/url"
 	"slices"
+	"strings"
 	"time"
 
 	"software.sslmate.com/src/certspotter/ctclient"
@@ -205,10 +207,15 @@ func newLogClient(config *Config, ctlog *loglist.Log) (ctclient.Log, ctclient.Is
 		if err != nil {
 			return nil, nil, fmt.Errorf("log has invalid URL: %w", err)
 		}
+		var httpClient *http.Client
+		if strings.Contains(ctlog.URL, "digicert") {
+			httpClient := ctclient.NewHTTPClient(nil)
+			httpClient.Transport.(*http.Transport).DisableKeepAlives = true
+		}
 		return &logClient{
 			config: config,
 			log:    ctlog,
-			client: &ctclient.RFC6962Log{URL: logURL},
+			client: &ctclient.RFC6962Log{URL: logURL, HTTPClient: httpClient},
 			lim:    rate.NewLimiter(downloadRateLimit(ctlog), 1),
 		}, nil, nil
 	case ctlog.IsStaticCTAPI():
