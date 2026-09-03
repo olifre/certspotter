@@ -38,7 +38,7 @@ func NewHTTPClient(dialContext func(context.Context, string, string) (net.Conn, 
 			ResponseHeaderTimeout: 30 * time.Second,
 			MaxIdleConnsPerHost:   10,
 			IdleConnTimeout:       90 * time.Second,
-			ExpectContinueTimeout: 1 * time.Second,
+			ExpectContinueTimeout: 5 * time.Second,
 			TLSClientConfig: &tls.Config{
 				// We have to disable TLS certificate validation because because several logs
 				// (WoSign, StartCom, GDCA) use certificates that are not widely trusted.
